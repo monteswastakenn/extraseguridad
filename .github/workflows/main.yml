@@ -24,7 +24,7 @@ jobs:
           dotnet-version: '10.0.x'
 
       - name: Restaurar dependencias
-        run: dotnet restore
+        run: dotnet restore WebApp.Tests/WebApp.Tests.csproj
 
       - name: Ejecutar pruebas con coverage
         run: |
