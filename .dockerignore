@@ -1,14 +1,35 @@
+# Compilación y dependencias
 **/bin/
 **/obj/
+**/TestResults/
+
+# Proyecto de pruebas (no se necesita en la imagen)
+WebApp.Tests/
+
+# Editores y sistema
 **/.vs/
 **/.vscode/
-.git/
-.github/
-.gitignore
 .DS_Store
 *.user
 *.suo
-*.db-shm
-*.db-wal
+
+# Git y CI
+.git/
+.github/
+.gitignore
+
+# Datos locales: la BD se crea dentro del contenedor (volumen /app/data)
+**/*.db
+**/*.db-shm
+**/*.db-wal
 WebApp/backups/
 
+# Secretos y logs
+.env
+**/*.env
+*.pem
+**/*.log
+
+# Documentación
+README.md
+docs/

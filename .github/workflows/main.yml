@@ -33,11 +33,33 @@ jobs:
             --collect:"XPlat Code Coverage" \
             --settings coverage.runsettings
 
-      - name: Mostrar coverage
+      - name: Generar resumen de coverage
         run: |
-          echo "===== RESULTADO DE COVERAGE ====="
-          grep -o 'line-rate="[^"]*"' \
-            WebApp.Tests/TestResults/*/coverage.cobertura.xml | head -1
+          dotnet tool install --global dotnet-reportgenerator-globaltool
+          reportgenerator \
+            -reports:"WebApp.Tests/TestResults/*/coverage.cobertura.xml" \
+            -targetdir:coverage-report \
+            -reporttypes:"TextSummary;MarkdownSummaryGithub;Html"
+          echo "===== RESUMEN DE COVERAGE ====="
+          cat coverage-report/Summary.txt
+          cat coverage-report/SummaryGithub.md >> $GITHUB_STEP_SUMMARY
+
+      - name: Verificar umbral mínimo de coverage (70%)
+        run: |
+          RATE=$(grep -o -m1 'line-rate="[^"]*"' WebApp.Tests/TestResults/*/coverage.cobertura.xml | head -1 | cut -d'"' -f2)
+          PORCENTAJE=$(awk "BEGIN { printf \"%.2f\", $RATE * 100 }")
+          echo "Cobertura de líneas: $PORCENTAJE% (mínimo requerido: 70%)"
+          if awk "BEGIN { exit !($PORCENTAJE < 70) }"; then
+            echo "::error::La cobertura ($PORCENTAJE%) es menor al 70%"
+            exit 1
+          fi
+          echo "Cobertura aprobada"
+
+      - name: Guardar reporte de coverage
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: coverage-report
 
   docker:
     name: Build y Push Docker
@@ -61,8 +83,8 @@ jobs:
           context: .
           push: true
           tags: |
-            monteswastaken/practica-devops-api:latest
-            monteswastaken/practica-devops-api:sha-${{ github.sha }}
+            ${{ secrets.DOCKERHUB_USERNAME }}/practica-devops-api:latest
+            ${{ secrets.DOCKERHUB_USERNAME }}/practica-devops-api:${{ github.sha }}
 
   deploy:
     name: Desplegar en EC2
@@ -82,20 +104,20 @@ jobs:
         run: |
           ssh -i ~/.ssh/ec2_key ubuntu@${{ secrets.EC2_HOST }} << 'COMANDOS'
             set -e
-            docker pull monteswastaken/practica-devops-api:latest
+            docker pull ${{ secrets.DOCKERHUB_USERNAME }}/practica-devops-api:latest
             docker rm -f practica-devops-api || true
             docker run -d --name practica-devops-api \
               --restart unless-stopped \
               -p 80:5172 -p 6061:6061 \
               -v practica-devops-data:/app/data \
-              monteswastaken/practica-devops-api:latest
+              ${{ secrets.DOCKERHUB_USERNAME }}/practica-devops-api:latest
             docker image prune -f
           COMANDOS
 
       - name: Comprobar que la API responde
         run: |
           for i in $(seq 1 12); do
-            if curl -sf http://${{ secrets.EC2_HOST }}/api/productos; then
+            if curl -sf http://${{ secrets.EC2_HOST }}/api/health; then
               echo ""
               echo "API desplegada correctamente"
               exit 0
