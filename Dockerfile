@@ -22,4 +22,10 @@ EXPOSE 6061
 
 ENV ASPNETCORE_URLS=http://+:5172
 
-ENTRYPOINT ["dotnet", "WebApp.dll"]
+# La BD SQLite (webapp.db) y los backups se guardan en el directorio de trabajo.
+# Se usa /app/data para poder montarlo como volumen y no perder datos al redesplegar.
+ENV ASPNETCORE_CONTENTROOT=/app
+WORKDIR /app/data
+VOLUME /app/data
+
+ENTRYPOINT ["dotnet", "/app/WebApp.dll"]
