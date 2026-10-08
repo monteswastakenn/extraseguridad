@@ -43,6 +43,7 @@ jobs:
     name: Build y Push Docker
     runs-on: ubuntu-latest
     needs: test
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
 
     steps:
       - name: Descargar código
@@ -53,15 +54,6 @@ jobs:
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
-
-      - name: Obtener metadata de Docker
-        id: meta
-        uses: docker/metadata-action@v5
-        with:
-          images: monteswastaken/practica-devops-api
-          tags: |
-            type=raw,value=latest
-            type=sha
 
       - name: Construir y subir imagen
         uses: docker/build-push-action@v6
