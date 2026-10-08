@@ -1,0 +1,14 @@
+**/bin/
+**/obj/
+**/.vs/
+**/.vscode/
+.git/
+.github/
+.gitignore
+.DS_Store
+*.user
+*.suo
+*.db-shm
+*.db-wal
+WebApp/backups/
+

@@ -1,0 +1,73 @@
+name: CI/CD - API REST
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+
+  test:
+    name: Tests y Coverage
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Descargar código
+        uses: actions/checkout@v4
+
+      - name: Configurar .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Restaurar dependencias
+        run: dotnet restore
+
+      - name: Ejecutar pruebas con coverage
+        run: |
+          dotnet test WebApp.Tests/WebApp.Tests.csproj \
+            --collect:"XPlat Code Coverage" \
+            --settings coverage.runsettings
+
+      - name: Mostrar coverage
+        run: |
+          echo "===== RESULTADO DE COVERAGE ====="
+          grep -o 'line-rate="[^"]*"' \
+            WebApp.Tests/TestResults/*/coverage.cobertura.xml | head -1
+
+
+  docker:
+    name: Build y Push Docker
+    runs-on: ubuntu-latest
+    needs: test
+
+    steps:
+      - name: Descargar código
+        uses: actions/checkout@v4
+
+      - name: Iniciar sesión en Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Obtener metadata de Docker
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: monteswastaken/practica-devops-api
+          tags: |
+            type=raw,value=latest
+            type=sha
+
+      - name: Construir y subir imagen
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          tags: |
+            monteswastaken/practica-devops-api:latest
+            monteswastaken/practica-devops-api:sha-${{ github.sha }}

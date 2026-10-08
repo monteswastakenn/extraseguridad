@@ -1,0 +1,15 @@
+**/bin/
+**/obj/
+.vs/
+.vscode/
+TestResults/
+
+*.db
+*.db-shm
+*.db-wal
+
+WebApp/backups/
+
+.DS_Store
+.env
+*.pem
