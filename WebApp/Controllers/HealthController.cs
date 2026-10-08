@@ -7,7 +7,7 @@ namespace WebApp.Controllers;
 public class HealthController : ControllerBase
 {
     // Mensaje que se cambia durante la demostración en vivo del pipeline
-    public const string Mensaje = "API REST funcionando - version 1";
+    public const string Mensaje = "API REST funcionando - version 2";
 
     // =====================================================
     // 11. GET - Estado de la API
