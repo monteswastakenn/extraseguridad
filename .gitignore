@@ -13,3 +13,6 @@ WebApp/backups/
 .DS_Store
 .env
 *.pem
+
+# Reporte (contiene la IP pública; no se publica)
+reporte/
