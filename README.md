@@ -178,17 +178,17 @@ docker logs practica-devops-api
 1. Cambiar el mensaje en `WebApp/Controllers/HealthController.cs`:
 
    ```csharp
-   public const string Mensaje = "API REST funcionando - version 2";
+   public const string Mensaje = "API REST funcionando - version 3";
    ```
 
 2. Subir el cambio:
 
    ```bash
    git add WebApp/Controllers/HealthController.cs
-   git commit -m "feat: actualizar mensaje de health a version 2"
+   git commit -m "feat: actualizar mensaje de health a version 3"
    git push origin main
    ```
 
 3. En **GitHub → Actions** se ejecutan en orden los jobs de tests, Docker y despliegue.
 4. En Docker Hub aparece un nuevo tag con el hash del commit.
-5. `http://<IP_EC2>/api/health` muestra el nuevo mensaje.
+5. `http://<IP_EC2>/api/health` muestra el nuevo mensaje ("version 3").
