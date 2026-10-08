@@ -9,7 +9,6 @@ on:
       - main
 
 jobs:
-
   test:
     name: Tests y Coverage
     runs-on: ubuntu-latest
@@ -29,6 +28,7 @@ jobs:
       - name: Ejecutar pruebas con coverage
         run: |
           dotnet test WebApp.Tests/WebApp.Tests.csproj \
+            --no-restore \
             --collect:"XPlat Code Coverage" \
             --settings coverage.runsettings
 
@@ -37,7 +37,6 @@ jobs:
           echo "===== RESULTADO DE COVERAGE ====="
           grep -o 'line-rate="[^"]*"' \
             WebApp.Tests/TestResults/*/coverage.cobertura.xml | head -1
-
 
   docker:
     name: Build y Push Docker
