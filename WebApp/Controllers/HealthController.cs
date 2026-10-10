@@ -21,7 +21,7 @@ public class HealthController : ControllerBase
             statusCode = 200,
             data = new
             {
-                estado = "OK",
+                estado = "OK2",
                 mensaje = Mensaje,
                 fecha = DateTime.UtcNow
             }
