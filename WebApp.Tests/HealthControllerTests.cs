@@ -30,7 +30,7 @@ public class HealthControllerTests
         var okResult = Assert.IsType<OkObjectResult>(resultado);
         var json = System.Text.Json.JsonSerializer.Serialize(okResult.Value);
 
-        Assert.Contains("\"estado\":\"OK\"", json);
+        Assert.Contains("\"estado\":\"OK2\"", json);
         Assert.Contains(HealthController.Mensaje, json);
     }
 }
